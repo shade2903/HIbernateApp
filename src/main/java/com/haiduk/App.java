@@ -1,7 +1,7 @@
 package com.haiduk;
 
-import com.haiduk.model.Item;
-import com.haiduk.model.Person;
+import com.haiduk.model.Actor;
+import com.haiduk.model.Movie;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -12,34 +12,34 @@ import java.util.List;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        Configuration configuration = new Configuration().addAnnotatedClass(Person.class)
-                .addAnnotatedClass(Item.class);
+public class App {
+    public static void main(String[] args) {
+        Configuration configuration = new Configuration().addAnnotatedClass(Actor.class)
+                .addAnnotatedClass(Movie.class);
 
         SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.getCurrentSession();
 
-        try{
+
+        try (sessionFactory) {
+            Session session = sessionFactory.getCurrentSession();
             session.beginTransaction();
 
-           Person person = session.get(Person.class, 4);
-           Item item = session.get(Item.class,1);
 
-           item.setOwner(person);
-           person.getItems().add(item);
-           session.remove(person);
+            Actor actor = session.get(Actor.class,2);
+            System.out.println(actor.getMovies());
+
+            Movie movieToRemove = actor.getMovies().get(0);
+
+            actor.getMovies().remove(movieToRemove);
+            movieToRemove.getActors().remove(actor);
 
 
 
-           session.getTransaction().commit();
 
-        }finally {
-            session.close();
+
+            session.getTransaction().commit();
+
         }
     }
 }
